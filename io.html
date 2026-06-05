@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSAFY 포트폴리오 | 개발자 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 부드러운 전환 효과 */
+        .project-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s ease-in-out, padding 0.6s ease, opacity 0.6s ease;
+            opacity: 0;
+        }
+
+        .accordion-content.active {
+            max-height: 1500px;
+            opacity: 1;
+            padding-top: 1rem;
+            padding-bottom: 1.5rem;
+        }
+
+        /* 필터 버튼 활성화 상태 */
+        .filter-btn.active {
+            background-color: #6366f1; /* Indigo 500 */
+            color: white;
+            border-color: #6366f1;
+        }
+        
+        /* 리스트 스타일 커스텀 */
+        .custom-list li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .custom-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #818cf8; /* indigo-400 */
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <header class="pt-20 pb-12 px-6 max-w-6xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+                Full-Stack & AI
+            </span> Developer
+        </h1>
+        <p class="text-slate-400 text-lg max-w-2xl mb-10">
+            데이터 수집부터 프론트엔드 반응형 웹, Django/FastAPI 백엔드 설계, AI 모델 융합까지. SSAFY 과정에서 수행한 11개의 프로젝트 포트폴리오입니다.
+        </p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-6 text-center">
+                <div class="text-4xl font-bold text-indigo-400 mb-2">11</div>
+                <div class="text-sm text-slate-400">Total Projects</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+                <div class="text-4xl font-bold text-cyan-400 mb-2">4</div>
+                <div class="text-sm text-slate-400">AI / LLM</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+                <div class="text-4xl font-bold text-emerald-400 mb-2">5</div>
+                <div class="text-sm text-slate-400">Backend API</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+                <div class="text-4xl font-bold text-amber-400 mb-2">6</div>
+                <div class="text-sm text-slate-400">Data / Visual</div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mt-8" id="filter-container">
+            <button class="filter-btn active px-5 py-2 rounded-full border border-slate-600 text-sm font-medium transition-all hover:bg-slate-700" data-filter="all">전체 보기</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-600 text-sm font-medium transition-all hover:bg-slate-700" data-filter="frontend">Frontend</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-600 text-sm font-medium transition-all hover:bg-slate-700" data-filter="backend">Backend & DB</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-600 text-sm font-medium transition-all hover:bg-slate-700" data-filter="ai">AI / Data</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-600 text-sm font-medium transition-all hover:bg-slate-700" data-filter="planning">Architecture</button>
+        </div>
+    </header>
+
+    <main class="px-6 max-w-6xl mx-auto">
+        <div id="projects-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            </div>
+    </main>
+
+    <script>
+        // 보강된 프로젝트 데이터 배열 (상세 내용 HTML 포맷 적용)
+        const projects = [
+            {
+                id: "11",
+                title: "대시보드 데이터 시각화 & AI 인사이트",
+                category: ["frontend", "ai"],
+                link: "https://lab.ssafy.com/jhp4820/11-pjt",
+                tags: ["Vue.js 3", "Chart.js", "Python", "Scikit-learn"],
+                summary: "대규모 데이터(스포츠, 도서) 전처리부터 다차원 인터랙티브 시각화 및 머신러닝 예측까지 구현한 종합 대시보드 애플리케이션입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">인터랙티브 시각화:</strong> Chart.js를 활용해 막대, 이중축, 라인, 산점도 등 다차원 대시보드 구축 및 동적 렌더링 구현.</li>
+                        <li><strong class="text-emerald-400">데이터 필터링:</strong> JSONL 형식의 1만 건 대규모 도서 데이터를 연도/장르별로 실시간 필터링하는 파이프라인 최적화.</li>
+                        <li><strong class="text-emerald-400">머신러닝 예측:</strong> Python과 Scikit-learn을 활용해 도서 판매량 예측 회귀 모델 구축 (MAE 3.8만, R2 0.74 수준 달성).</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 데이터 전처리의 중요성을 체감했으며, 다크모드 등 테마 변경 시 동적으로 차트 인스턴스를 갱신하고 메모리를 관리하는 방법을 습득했습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "10",
+                title: "지능형 금융 서비스 플랫폼",
+                category: ["frontend"],
+                link: "https://lab.ssafy.com/jhp4820/10_pjt",
+                tags: ["JavaScript", "Kakao Map API", "Kakao Mobility"],
+                summary: "실시간 GPS 위치를 기반으로 최적의 주변 은행을 검색하고, 카카오 모빌리티와 연동하여 내비게이션 경로까지 안내하는 스마트 웹입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">LBS 기반 검색:</strong> 브라우저 geolocation API를 활용해 접속 즉시 반경 2km 이내 은행을 거리순 정렬하여 동적 마커 렌더링.</li>
+                        <li><strong class="text-emerald-400">실시간 경로 안내:</strong> 카카오 모빌리티 REST API 비동기 통신으로 좌표를 받아 출발지-목적지 간 최단 경로(Polyline) 및 예상 소요 시간/거리 산출.</li>
+                        <li><strong class="text-emerald-400">UX 고도화:</strong> 카카오맵 앱 딥링크 연결, 에러 핸들링, 마우스 호버 툴팁 등 디테일한 UI 설계 적용.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 대용량 좌표 데이터의 비동기 처리 및 DOM 누수 방지 기법을 익혔으며, 서비스 간 연결(Connectivity)이 주는 강력한 사용자 경험을 체험했습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "09",
+                title: "멀티모달 AI 분석/추천 프록시 서버",
+                category: ["backend", "ai"],
+                link: "https://lab.ssafy.com/jhp4820/09_pjt",
+                tags: ["FastAPI", "Django", "LLMs", "Imagen 4.0"],
+                summary: "Django 프록시 서버와 FastAPI 모델 서버를 분리해 보안을 강화하고, 텍스트/이미지/음성을 아우르는 멀티모달 AI 파이프라인을 구축했습니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">프록시 아키텍처:</strong> 클라이언트와 모델 간 직접 통신을 차단하고, Django 프록시에서 API Key 관리 및 CORS 문제를 중앙 제어.</li>
+                        <li><strong class="text-emerald-400">AI 가드레일:</strong> gpt-5-nano 모델을 활용해 사용자 입력의 선정성/위험성을 1차 검열하는 파이프라인 구축.</li>
+                        <li><strong class="text-emerald-400">멀티모달 통합:</strong> 텍스트 응답, Imagen 4.0 기반 고화질 이미지 생성, Gemini 2.0 시각 분석, TTS 음성 변환 기능 통합.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 구조화된 출력(JSON Schema) 프롬프팅과 Base64 인코딩을 통한 바이너리 데이터 전송, 그리고 비용 효율적 크레딧 모델 선택 노하우를 습득했습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "08",
+                title: "금융 상품 데이터 REST API Server",
+                category: ["backend"],
+                link: "https://lab.ssafy.com/jhp4820/08_pjt",
+                tags: ["Django", "DRF", "REST API", "ORM"],
+                summary: "금융감독원 Open API를 DB에 적재하고 JSON 형태로 응답하는 백엔드 서버를 구축하며 DRF의 직렬화와 ORM 관계를 학습했습니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">데이터 수집 및 적재:</strong> 외부 금융상품통합비교공시 API와 연동해 정기예금 데이터 수집 후 DB 저장 로직 구현.</li>
+                        <li><strong class="text-emerald-400">RDBMS 매핑:</strong> Django ORM을 활용하여 상품 정보와 세부 옵션 정보를 1:N (ForeignKey) 관계로 구조화.</li>
+                        <li><strong class="text-emerald-400">더미 데이터 증강:</strong> 부족한 데이터셋을 보완하기 위해 생성형 AI를 호출, 실제 은행 상품 규격에 맞는 더미 데이터 자동 생성 로직(F811) 적용.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> DRF Serializer 설계, 외부 연동 시 환경변수(.env) 보안 관리, Postman을 활용한 철저한 API 응답 및 예외 처리 테스트의 중요성을 체득했습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "07",
+                title: "FinGuard - AI 재정 관리 플랫폼 기획",
+                category: ["planning"],
+                link: "https://lab.ssafy.com/jhp4820/07_pjt",
+                tags: ["Architecture", "ERD", "WBS", "Use Case"],
+                summary: "40~70대 중장년층을 타겟으로 자산 시각화, AI 은퇴 시뮬레이션, 금융사기 탐지 기능을 설계한 종합 프로젝트 기획안입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">서비스 설계:</strong> 흩어진 자산을 직관적인 '자산 마을(Asset Town)'로 시각화하고, AI 기반 재정 점수 및 이체 전 사기 위험도 분석(Guard AI) 플로우 기획.</li>
+                        <li><strong class="text-emerald-400">DB 모델링:</strong> 사용자, 자산, 거래, 리포트 엔티티 간의 관계를 체계적으로 정의한 범용 ERD 구축.</li>
+                        <li><strong class="text-emerald-400">프로젝트 관리:</strong> 7단계 Phase로 구성된 WBS 및 기능 의존성을 고려한 Gantt Chart, Use Case Diagram 작성.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 개발 관점이 아닌 '사용자 문제 해결' 관점의 기획의 중요성, 그리고 기능적/비기능적 요구사항(보안/접근성)을 분리하여 우선순위를 설정하는 역량을 길렀습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "06",
+                title: "토스증권 커뮤니티 댓글 분석 파이프라인",
+                category: ["backend", "ai"],
+                link: "https://lab.ssafy.com/jhp4820/06_pjt",
+                tags: ["Django", "Selenium", "Pandas", "LLM"],
+                summary: "동적 크롤링으로 투자자 반응을 수집하고 전처리(Pandas) 및 AI 증강/요약을 자동 수행하는 데이터 파이프라인 시스템입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">동적 크롤링:</strong> Selenium의 무한 스크롤 및 동적 대기(Wait) 로직을 통해 토스증권 커뮤니티 데이터 자동 수집.</li>
+                        <li><strong class="text-emerald-400">데이터 전처리:</strong> Pandas를 활용하여 노이즈 제거, 특수문자 정제 및 IQR 방식을 활용한 이상치 데이터 통계적 정제.</li>
+                        <li><strong class="text-emerald-400">LLM 증강 및 요약:</strong> 수집된 데이터의 의미를 훼손하지 않고 텍스트를 증강시킨 후, 핵심 투자 심리를 요약하는 파이프라인 구성.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 비동기 분석 중 이탈 방지를 위한 Polling UI 처리 경험과, 향후 속도 개선을 위한 병렬 처리 및 DB 캐싱의 필요성을 확인했습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "05",
+                title: "금융 자산 정보 토론 커뮤니티",
+                category: ["backend"],
+                link: "https://lab.ssafy.com/jhp4820/05-pjt",
+                tags: ["Python", "Django", "Auth", "CRUD"],
+                summary: "Django 인증 시스템을 커스터마이징하여 권한 관리, 필터링, 사용자 성향 분석에 초점을 맞춘 백엔드 게시판 프로젝트입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">커스텀 유저 모델:</strong> Django AbstractUser를 상속받아 닉네임, 관심 종목, 프로필 사진을 포함하는 확장형 회원 시스템 구현.</li>
+                        <li><strong class="text-emerald-400">권한 기반 CRUD:</strong> 작성자 및 관리자 권한을 분리하여 엄격하게 제어되는 게시물 접근/수정/삭제 로직 개발.</li>
+                        <li><strong class="text-emerald-400">텍스트 필터링 & 분석:</strong> 게시판 내 부적절 표현을 필터링하고, 사용자가 작성한 글의 텍스트 패턴을 기반으로 투자 성향을 분석하는 기능 탑재.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 로그인 및 세션 관리 등 복잡하게 얽힌 인증 로직을 Django 내장 폼과 커스텀 메서드를 통해 유연하고 안정적으로 다루는 방법을 체득했습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "04",
+                title: "AI 연동 및 외부 API 기반 동적 게시판",
+                category: ["backend", "ai"],
+                link: "https://lab.ssafy.com/jhp4820/04_pjt",
+                tags: ["Django", "TMDB API", "Upstage Solar", "RAG"],
+                summary: "단순 CRUD를 넘어 생성형 AI와 TMDB API 데이터를 융합하여 동적 추천 및 비정형 데이터 정형화를 수행한 심화 프로젝트입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">RAG 아키텍처 기초:</strong> Upstage Solar LLM 모델을 활용하여 비정형 문장(Wiki 등)을 시스템이 처리할 수 있는 정형 JSON 형식으로 자동 변환.</li>
+                        <li><strong class="text-emerald-400">외부 API 기반 추천:</strong> TMDB 영화 메타데이터를 실시간 호출하고, 장르 ID를 비교/분석하여 사용자 연관 콘텐츠 추천 알고리즘 설계.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> AI 응답 값 내에 마크다운 기호가 혼재될 때 발생하는 JSON 파싱 에러를 해결하기 위한 전처리 로직 작성 능력을 키우고, 네트워크 지연에 대비한 프론트 에러 핸들링의 중요성을 깨달았습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "03",
+                title: "반응형 Profile 웹 페이지 구현",
+                category: ["frontend"],
+                link: "https://lab.ssafy.com/jhp4820/03_pjt",
+                tags: ["HTML5", "CSS3", "JavaScript", "Bootstrap"],
+                summary: "HTML, CSS, Vanilla JS를 활용해 금융 자산 포트폴리오 관리에 최적화된 모바일 친화적 반응형 프로필 페이지를 디자인했습니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">커스텀 UI 컴포넌트:</strong> 기본 input을 숨기고 Label을 활용해 스타일링한 '투자 성향 선택용 칩(Pill) UI' 구현.</li>
+                        <li><strong class="text-emerald-400">반응형 레이아웃:</strong> 768px 미디어 쿼리 분기점을 설정하여 좌우 2열 배치에서 상하 1열 세로 배치로 부드럽게 전환되는 CSS Flexbox 설계.</li>
+                        <li><strong class="text-emerald-400">동적 DOM 제어:</strong> JS와 FileReader API를 이용한 로컬 이미지 즉시 미리보기 및 '최애 은행 뱃지' 동적 추가/삭제 기능 구현.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> Bootstrap의 Grid 의존성을 줄이고 순수 CSS(변수, Flex)만으로 반응형 정보 계층을 재구성하는 아키텍처 설계 능력을 키웠습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "02",
+                title: "금융 주가 시계열 데이터 수집 및 분석",
+                category: ["ai"],
+                link: "https://lab.ssafy.com/jhp4820/02-pjt",
+                tags: ["Python", "Pandas", "Matplotlib", "Prompting"],
+                summary: "주식 CSV 데이터를 전처리하고 통계를 시각화한 뒤, 그 결과를 바탕으로 전문 애널리스트 페르소나의 분석 프롬프트를 자동 생성하는 프로젝트입니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">시계열 데이터 필터링:</strong> Pandas를 활용하여 넷플릭스 주가 CSV 파일 로드 및 2021년 이후 데이터 추출, 결측치 처리.</li>
+                        <li><strong class="text-emerald-400">통계 연산 및 시각화:</strong> 최고/최저 종가 및 월별 평균 종가 집계, Matplotlib을 이용한 추이 그래프 시각화.</li>
+                        <li><strong class="text-emerald-400">프롬프트 엔지니어링:</strong> 코드에서 산출된 정량적 데이터(최고/최저/현재가)를 포맷팅하여, '월스트리트 수석 애널리스트' 페르소나의 거시경제/펀더멘털 분석을 요구하는 LLM 프롬프트 자동 생성.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 단순 통계 도출을 넘어 파이썬 코딩과 생성형 AI 프롬프팅을 결합하여 실질적인 비즈니스 인사이트를 도출하는 융합적 데이터 활용법을 배웠습니다.</li>
+                    </ul>`
+            },
+            {
+                id: "01",
+                title: "API 기반 데이터 수집 및 기초 전처리",
+                category: ["backend", "ai"],
+                link: "https://lab.ssafy.com/jhp4820/01-pjt",
+                tags: ["Python", "REST API", "JSON", "Data Parsing"],
+                summary: "외부 공공/기상 API와 통신하여 거대한 JSON 응답 속에서 필요한 핵심 정보만 추출하고 병합하는 기초 파이프라인을 구축했습니다.",
+                details: `
+                    <ul class="custom-list text-slate-300 text-sm leading-relaxed">
+                        <li><strong class="text-emerald-400">OpenWeather API:</strong> 날씨 데이터 요청 후 dict_keys 뷰로 구조 파악, 특정 필드 필터링, 단위 변환(섭씨) 및 키값 한글화 매핑 수행.</li>
+                        <li><strong class="text-emerald-400">금융감독원 Open API:</strong> 정기예금 전체 리스트와 복잡하게 얽힌 옵션 정보를 분리 추출.</li>
+                        <li><strong class="text-emerald-400">데이터 구조화:</strong> 분리 추출된 기본 상품 정보에 1:N 관계로 해당 옵션 배열들을 통합하여 새로운 최종 딕셔너리 포맷 구축.</li>
+                        <li><strong class="text-indigo-300">💡 배운 점:</strong> 클라이언트와 서버의 통신 구조, Requests 라이브러리 활용법, 그리고 불규칙한 외부 JSON 구조를 내가 원하는 RDBMS 친화적 구조로 전처리하는 기초 감각을 익혔습니다.</li>
+                    </ul>`
+            }
+        ];
+
+        const gridContainer = document.getElementById('projects-grid');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        // 카드 렌더링 함수
+        function renderProjects(filter = 'all') {
+            gridContainer.innerHTML = '';
+            
+            const filtered = projects.filter(p => filter === 'all' || p.category.includes(filter));
+            
+            filtered.forEach((p, index) => {
+                // 태그 뱃지 생성
+                const tagsHTML = p.tags.map(tag => 
+                    `<span class="px-2 py-1 bg-slate-800 border border-slate-600 rounded-md text-xs text-indigo-300 whitespace-nowrap">${tag}</span>`
+                ).join('');
+
+                const cardHTML = `
+                    <div class="project-card glass-card rounded-2xl overflow-hidden flex flex-col opacity-0" style="animation: fadeIn 0.5s ease forwards ${index * 0.08}s;">
+                        <div class="p-6 flex-grow cursor-pointer toggle-btn">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-xs font-bold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg border border-indigo-500/30">PJT ${p.id}</span>
+                                <a href="${p.link}" target="_blank" class="text-slate-400 hover:text-white transition-colors bg-slate-800 p-2 rounded-full border border-slate-700" onclick="event.stopPropagation();" title="GitLab 리포지토리 보기">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </a>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">${p.title}</h3>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${tagsHTML}
+                            </div>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-1">${p.summary}</p>
+                            
+                            <div class="accordion-content mt-4 border-t border-slate-700/50">
+                                <h4 class="text-sm font-semibold text-white mb-3">📌 주요 구현 & 학습 내용</h4>
+                                ${p.details}
+                            </div>
+                        </div>
+                        <div class="px-6 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-between items-center toggle-btn cursor-pointer hover:bg-slate-700 transition-colors">
+                            <span class="text-xs font-medium text-indigo-300 expand-text">상세 내용 보기</span>
+                            <svg class="w-4 h-4 text-indigo-400 transform transition-transform duration-300 chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                `;
+                gridContainer.insertAdjacentHTML('beforeend', cardHTML);
+            });
+
+            // 아코디언 이벤트 리스너 재할당
+            document.querySelectorAll('.project-card').forEach(card => {
+                const toggles = card.querySelectorAll('.toggle-btn');
+                const content = card.querySelector('.accordion-content');
+                const icon = card.querySelector('.chevron-icon');
+                const text = card.querySelector('.expand-text');
+
+                toggles.forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        content.classList.toggle('active');
+                        if(content.classList.contains('active')) {
+                            icon.classList.add('rotate-180');
+                            text.textContent = '접기';
+                        } else {
+                            icon.classList.remove('rotate-180');
+                            text.textContent = '상세 내용 보기';
+                        }
+                    });
+                });
+            });
+        }
+
+        // 필터 버튼 클릭 이벤트
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // 액티브 클래스 변경
+                filterBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // 렌더링 호출
+                renderProjects(e.target.dataset.filter);
+            });
+        });
+
+        // 초기 렌더링
+        renderProjects();
+    </script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>
